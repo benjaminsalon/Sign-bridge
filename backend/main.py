@@ -5,6 +5,8 @@ import uuid
 import os
 import shutil
 import uvicorn
+# Removed pydub import due to pyaudioop missing issue
+# from pydub import AudioSegment
 
 app = FastAPI()
 
@@ -24,18 +26,19 @@ WHISPER_EXECUTABLE = "./whisper.cpp/build/bin/whisper-cli"  # Correct path to bu
 
 @app.post("/transcribe")
 async def transcribe(audio: UploadFile = File(...)):
+    # Only accept wav files for now
     if audio.content_type not in ["audio/wav", "audio/x-wav", "audio/wave"]:
         raise HTTPException(status_code=400, detail="Invalid audio format. WAV required.")
-    # Save uploaded audio to temp file
-    temp_filename = f"{uuid.uuid4()}.wav"
-    temp_filepath = os.path.join(TEMP_DIR, temp_filename)
-    with open(temp_filepath, "wb") as f:
+    # Save uploaded audio to temp wav file
+    temp_wav_filename = f"{uuid.uuid4()}.wav"
+    temp_wav_filepath = os.path.join(TEMP_DIR, temp_wav_filename)
+    with open(temp_wav_filepath, "wb") as f:
         shutil.copyfileobj(audio.file, f)
-    # Run whisper.cpp executable on the temp file
+    # Run whisper.cpp executable on the wav file
     try:
         # Run whisper-cli with model path argument
         result = subprocess.run(
-            [WHISPER_EXECUTABLE, "-m", "whisper.cpp/models/ggml-base.en.bin", "-f", temp_filepath],
+            [WHISPER_EXECUTABLE, "-m", "whisper.cpp/models/ggml-base.en.bin", "-f", temp_wav_filepath],
             capture_output=True,
             text=True,
             check=True,
@@ -45,8 +48,8 @@ async def transcribe(audio: UploadFile = File(...)):
     except subprocess.CalledProcessError as e:
         raise HTTPException(status_code=500, detail=f"Transcription failed: {e.stderr}")
     finally:
-        # Clean up temp file
-        os.remove(temp_filepath)
+        # Clean up temp wav file
+        os.remove(temp_wav_filepath)
     return {"text": transcription}
 
 if __name__ == "__main__":

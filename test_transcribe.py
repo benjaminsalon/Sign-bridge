@@ -2,13 +2,17 @@ import requests
 
 def test_transcribe():
     url = "http://127.0.0.1:8000/transcribe"
-    audio_path = "test_audio.wav"  # Provide a valid WAV file path for testing
+    audio_path = "test_audio.wav"  # Use the WAV file confirmed to be in the root folder
 
     with open(audio_path, "rb") as f:
         files = {"audio": ("test_audio.wav", f, "audio/wav")}
         response = requests.post(url, files=files)
         print("Status Code:", response.status_code)
-        print("Response JSON:", response.json())
+        try:
+            print("Response JSON:", response.json())
+        except Exception as e:
+            print("Failed to parse JSON response:", e)
+            print("Response text:", response.text)
 
 if __name__ == "__main__":
     test_transcribe()
