@@ -136,3 +136,4 @@ src-tauri/bundle/
 
 # Temporary audio files
 temp_audio/
+backend/__pycache__/
