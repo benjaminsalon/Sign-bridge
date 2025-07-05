@@ -1,16 +1,28 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import UploadFile, File, HTTPException
 import subprocess
 import uuid
 import os
 import shutil
-from backend.simplify_text import router as simplify_router
-from backend.signwriting_translation_pytorch import router as signwriting_router
+import uvicorn
+import tempfile
+from pydub import AudioSegment
+import logging
+import asyncio
+
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import os
+import tempfile
+import logging
+import asyncio
+
+# from .api.signwriting_translation import router as signwriting_translation_router #this file has issues for now as an alternative we will use the pytorch file
+from .api.signwriting_translation_pytorch import router as signwriting_translation_pytorch_router
+from .api.simplify_text import router as simplify_text_router
 
 app = FastAPI()
 
-# Allow CORS for frontend communication
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,39 +31,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-TEMP_DIR = "temp_audio"
-os.makedirs(TEMP_DIR, exist_ok=True)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..")) 
 
-WHISPER_EXECUTABLE = "./whisper.cpp/build/bin/whisper-cli"  # Correct path to built executable
+WHISPER_EXECUTABLE = os.path.join(PROJECT_ROOT, "whisper.cpp/build/bin/whisper-cli")
+WHISPER_MODEL = os.path.join(PROJECT_ROOT, "whisper.cpp/models/ggml-base.en.bin")
 
-app.include_router(simplify_router)
-app.include_router(signwriting_router)
+if not os.path.exists(WHISPER_EXECUTABLE):
+    raise FileNotFoundError(f"Whisper executable not found at: {WHISPER_EXECUTABLE}")
+if not os.path.exists(WHISPER_MODEL):
+    raise FileNotFoundError(f"Whisper model not found at: {WHISPER_MODEL}")
 
-@app.post("/transcribe")
-async def transcribe(audio: UploadFile = File(...)):
-    # Only accept wav files for now
-    if audio.content_type not in ["audio/wav", "audio/x-wav", "audio/wave"]:
-        raise HTTPException(status_code=400, detail="Invalid audio format. WAV required.")
-    # Save uploaded audio to temp wav file
-    temp_wav_filename = f"{uuid.uuid4()}.wav"
-    temp_wav_filepath = os.path.join(TEMP_DIR, temp_wav_filename)
-    with open(temp_wav_filepath, "wb") as f:
-        shutil.copyfileobj(audio.file, f)
-    # Run whisper.cpp executable on the wav file
-    try:
-        # Run whisper-cli with model path argument
-        result = subprocess.run(
-            [WHISPER_EXECUTABLE, "-m", "whisper.cpp/models/ggml-base.en.bin", "-f", temp_wav_filepath],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        # Parse transcription from stdout
-        transcription = result.stdout.strip()
-    except subprocess.CalledProcessError as e:
-        raise HTTPException(status_code=500, detail=f"Transcription failed: {e.stderr}")
-    finally:
-        # Clean up temp wav file
-        os.remove(temp_wav_filepath)
-    return {"text": transcription}
+logging.basicConfig(level=logging.DEBUG)
 
+from .api.transcribe import router as transcribe_router
+app.include_router(transcribe_router)
+
+# app.include_router(signwriting_translation_router) # disabled for now
+app.include_router(signwriting_translation_pytorch_router)
+app.include_router(simplify_text_router)
