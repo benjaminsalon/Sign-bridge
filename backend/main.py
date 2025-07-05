@@ -5,8 +5,14 @@ import uuid
 import os
 import shutil
 import uvicorn
-# Removed pydub import due to pyaudioop missing issue
-# from pydub import AudioSegment
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import UploadFile, File, HTTPException
+import subprocess
+import uuid
+import os
+import shutil
+from backend.simplify_text import router as simplify_router
 
 app = FastAPI()
 
@@ -23,6 +29,12 @@ TEMP_DIR = "temp_audio"
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 WHISPER_EXECUTABLE = "./whisper.cpp/build/bin/whisper-cli"  # Correct path to built executable
+
+app.include_router(simplify_router)
+
+from backend.signwriting_translation_pytorch import router as signwriting_router
+
+app.include_router(signwriting_router)
 
 @app.post("/transcribe")
 async def transcribe(audio: UploadFile = File(...)):
@@ -52,5 +64,3 @@ async def transcribe(audio: UploadFile = File(...)):
         os.remove(temp_wav_filepath)
     return {"text": transcription}
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
