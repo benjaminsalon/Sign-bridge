@@ -41,7 +41,13 @@ pip install -r backend/requirements.txt
 ### Python 3.11 Environment (For Text-to-SignWriting)
 
 ```bash
+# Install Python 3.11 if not installed
+brew install python@3.11
+
+# Run setup script to create and activate Python 3.11 virtual environment and install dependencies
 ./setup_py311_env.sh
+
+# Activate the Python 3.11 environment
 source py311_venv/bin/activate
 ```
 
@@ -74,3 +80,5 @@ Run tests using the appropriate Python environment.
 ## License
 
 This project is licensed under the MIT License.
+uvicorn backend.main:app --reload
+source py311_venv/bin/activate
