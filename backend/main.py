@@ -1,10 +1,3 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-import subprocess
-import uuid
-import os
-import shutil
-import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import UploadFile, File, HTTPException
@@ -13,6 +6,7 @@ import uuid
 import os
 import shutil
 from backend.simplify_text import router as simplify_router
+from backend.signwriting_translation_pytorch import router as signwriting_router
 
 app = FastAPI()
 
@@ -31,9 +25,6 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 WHISPER_EXECUTABLE = "./whisper.cpp/build/bin/whisper-cli"  # Correct path to built executable
 
 app.include_router(simplify_router)
-
-from backend.signwriting_translation_pytorch import router as signwriting_router
-
 app.include_router(signwriting_router)
 
 @app.post("/transcribe")
