@@ -6,7 +6,7 @@ import os
 import shutil
 import uvicorn
 import tempfile
-from pydub import AudioSegment
+# from pydub import AudioSegment  # Commented out due to pyaudioop dependency issues
 import logging
 import asyncio
 
@@ -20,6 +20,7 @@ import asyncio
 # from .api.signwriting_translation import router as signwriting_translation_router #this file has issues for now as an alternative we will use the pytorch file
 from .api.signwriting_translation_pytorch import router as signwriting_translation_pytorch_router
 from .api.simplify_text import router as simplify_text_router
+from .api.pose_generation import router as pose_generation_router
 
 app = FastAPI()
 
@@ -50,3 +51,4 @@ app.include_router(transcribe_router)
 # app.include_router(signwriting_translation_router) # disabled for now
 app.include_router(signwriting_translation_pytorch_router)
 app.include_router(simplify_text_router)
+app.include_router(pose_generation_router)

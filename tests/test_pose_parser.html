@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pose Parser Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .test-section { margin: 20px 0; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Pose Parser Test</h1>
+    
+    <div class="test-section">
+        <h2>Mock Pose Data Visualization</h2>
+        <canvas id="mockCanvas" width="640" height="480"></canvas>
+        <div id="mockInfo"></div>
+    </div>
+
+    <script type="module">
+        // Mock the PoseDataParser for testing
+        class MockPoseDataParser {
+            static getMockPoseData() {
+                return [{
+                    poseLandmarks: [
+                        { x: 0.5, y: 0.2, z: 0.0 }, // 0: NOSE
+                        { x: 0.48, y: 0.18, z: 0.0 }, // 1: LEFT_EYE_INNER
+                        { x: 0.47, y: 0.17, z: 0.0 }, // 2: LEFT_EYE
+                        { x: 0.45, y: 0.18, z: 0.0 }, // 3: LEFT_EYE_OUTER
+                        { x: 0.52, y: 0.18, z: 0.0 }, // 4: RIGHT_EYE_INNER
+                        { x: 0.53, y: 0.17, z: 0.0 }, // 5: RIGHT_EYE
+                        { x: 0.55, y: 0.18, z: 0.0 }, // 6: RIGHT_EYE_OUTER
+                        { x: 0.44, y: 0.2, z: 0.0 }, // 7: LEFT_EAR
+                        { x: 0.56, y: 0.2, z: 0.0 }, // 8: RIGHT_EAR
+                        { x: 0.48, y: 0.25, z: 0.0 }, // 9: MOUTH_LEFT
+                        { x: 0.52, y: 0.25, z: 0.0 }, // 10: MOUTH_RIGHT
+                        { x: 0.4, y: 0.3, z: 0.0 }, // 11: LEFT_SHOULDER
+                        { x: 0.6, y: 0.3, z: 0.0 }, // 12: RIGHT_SHOULDER
+                        { x: 0.35, y: 0.5, z: 0.0 }, // 13: LEFT_ELBOW
+                        { x: 0.65, y: 0.5, z: 0.0 }, // 14: RIGHT_ELBOW
+                        { x: 0.3, y: 0.7, z: 0.0 }, // 15: LEFT_WRIST
+                        { x: 0.7, y: 0.7, z: 0.0 }, // 16: RIGHT_WRIST
+                        { x: 0.25, y: 0.65, z: 0.0 }, // 17: LEFT_PINKY
+                        { x: 0.75, y: 0.65, z: 0.0 }, // 18: RIGHT_PINKY
+                        { x: 0.2, y: 0.6, z: 0.0 }, // 19: LEFT_INDEX
+                        { x: 0.8, y: 0.6, z: 0.0 }, // 20: RIGHT_INDEX
+                        { x: 0.15, y: 0.55, z: 0.0 }, // 21: LEFT_THUMB
+                        { x: 0.85, y: 0.55, z: 0.0 }, // 22: RIGHT_THUMB
+                        { x: 0.4, y: 0.8, z: 0.0 }, // 23: LEFT_HIP
+                        { x: 0.6, y: 0.8, z: 0.0 }, // 24: RIGHT_HIP
+                        { x: 0.35, y: 0.9, z: 0.0 }, // 25: LEFT_KNEE
+                        { x: 0.65, y: 0.9, z: 0.0 }, // 26: RIGHT_KNEE
+                        { x: 0.3, y: 0.95, z: 0.0 }, // 27: LEFT_ANKLE
+                        { x: 0.7, y: 0.95, z: 0.0 }, // 28: RIGHT_ANKLE
+                        { x: 0.25, y: 0.98, z: 0.0 }, // 29: LEFT_HEEL
+                        { x: 0.75, y: 0.98, z: 0.0 }, // 30: RIGHT_HEEL
+                        { x: 0.2, y: 1.0, z: 0.0 }, // 31: LEFT_FOOT_INDEX
+                        { x: 0.8, y: 1.0, z: 0.0 }, // 32: RIGHT_FOOT_INDEX
+                    ],
+                    leftHandLandmarks: Array.from({ length: 21 }, (_, i) => ({
+                        x: 0.3 + (i % 5) * 0.02,
+                        y: 0.7 + Math.floor(i / 5) * 0.05,
+                        z: 0.0
+                    })),
+                    rightHandLandmarks: Array.from({ length: 21 }, (_, i) => ({
+                        x: 0.7 + (i % 5) * 0.02,
+                        y: 0.7 + Math.floor(i / 5) * 0.05,
+                        z: 0.0
+                    }))
+                }];
+            }
+        }
+
+        function drawSkeleton(ctx, pose, width, height) {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, width, height);
+
+            if (pose.poseLandmarks && pose.poseLandmarks.length >= 33) {
+                ctx.strokeStyle = '#00FF00';
+                ctx.lineWidth = 2;
+                
+                // MediaPipe Pose connections (33 landmarks)
+                const connections = [
+                    // Face connections
+                    [0, 1], [1, 2], [2, 3], [3, 7], // Left eye to left ear
+                    [0, 4], [4, 5], [5, 6], [6, 8], // Right eye to right ear
+                    [9, 10], // Mouth
+                    
+                    // Body connections
+                    [11, 12], // Shoulders
+                    [11, 13], [13, 15], // Left arm
+                    [12, 14], [14, 16], // Right arm
+                    [11, 23], [12, 24], // Shoulders to hips
+                    [23, 24], // Hips
+                    
+                    // Legs
+                    [23, 25], [25, 27], [27, 29], [29, 31], // Left leg
+                    [24, 26], [26, 28], [28, 30], [30, 32], // Right leg
+                    
+                    // Additional arm connections
+                    [15, 17], [15, 19], [15, 21], // Left wrist to fingers
+                    [16, 18], [16, 20], [16, 22], // Right wrist to fingers
+                ];
+
+                connections.forEach(([start, end]) => {
+                    if (pose.poseLandmarks[start] && pose.poseLandmarks[end] && 
+                        pose.poseLandmarks[start].x !== 0 && pose.poseLandmarks[start].y !== 0 &&
+                        pose.poseLandmarks[end].x !== 0 && pose.poseLandmarks[end].y !== 0) {
+                        ctx.beginPath();
+                        ctx.moveTo(pose.poseLandmarks[start].x * width, pose.poseLandmarks[start].y * height);
+                        ctx.lineTo(pose.poseLandmarks[end].x * width, pose.poseLandmarks[end].y * height);
+                        ctx.stroke();
+                    }
+                });
+                
+                // Draw joints
+                ctx.fillStyle = '#FF0000';
+                pose.poseLandmarks.forEach((landmark, index) => {
+                    if (landmark.x !== 0 || landmark.y !== 0) {
+                        ctx.beginPath();
+                        ctx.arc(landmark.x * width, landmark.y * height, 3, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                });
+            }
+
+            // Draw hands
+            if (pose.leftHandLandmarks) {
+                drawHand(ctx, pose.leftHandLandmarks, '#FF0000', width, height);
+            }
+            
+            if (pose.rightHandLandmarks) {
+                drawHand(ctx, pose.rightHandLandmarks, '#00FF00', width, height);
+            }
+        }
+
+        function drawHand(ctx, landmarks, color, width, height) {
+            if (!landmarks || landmarks.length < 21) return;
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+
+            // MediaPipe Hand connections (21 landmarks)
+            const handConnections = [
+                // Thumb
+                [0, 1], [1, 2], [2, 3], [3, 4],
+                // Index finger
+                [0, 5], [5, 6], [6, 7], [7, 8],
+                // Middle finger
+                [0, 9], [9, 10], [10, 11], [11, 12],
+                // Ring finger
+                [0, 13], [13, 14], [14, 15], [15, 16],
+                // Pinky
+                [0, 17], [17, 18], [18, 19], [19, 20],
+            ];
+
+            handConnections.forEach(([start, end]) => {
+                if (landmarks[start] && landmarks[end] && 
+                    landmarks[start].x !== 0 && landmarks[start].y !== 0 &&
+                    landmarks[end].x !== 0 && landmarks[end].y !== 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(landmarks[start].x * width, landmarks[start].y * height);
+                    ctx.lineTo(landmarks[end].x * width, landmarks[end].y * height);
+                    ctx.stroke();
+                }
+            });
+
+            ctx.fillStyle = color;
+            landmarks.forEach(landmark => {
+                if (landmark.x !== 0 || landmark.y !== 0) {
+                    ctx.beginPath();
+                    ctx.arc(landmark.x * width, landmark.y * height, 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+        }
+
+        // Test the visualization
+        const canvas = document.getElementById('mockCanvas');
+        const ctx = canvas.getContext('2d');
+        const mockPose = MockPoseDataParser.getMockPoseData()[0];
+        
+        drawSkeleton(ctx, mockPose, 640, 480);
+        
+        document.getElementById('mockInfo').innerHTML = `
+            <p>✅ Mock pose data rendered successfully!</p>
+            <p>Body landmarks: ${mockPose.poseLandmarks.length}</p>
+            <p>Left hand landmarks: ${mockPose.leftHandLandmarks.length}</p>
+            <p>Right hand landmarks: ${mockPose.rightHandLandmarks.length}</p>
+        `;
+    </script>
+</body>
+</html> 
