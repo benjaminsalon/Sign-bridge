@@ -16,9 +16,10 @@ import tempfile
 import logging
 import asyncio
 
-from .api.signwriting_translation_pytorch import router as signwriting_translation_pytorch_router
-from .api.simplify_text import router as simplify_text_router
-from .api.pose_generation import router as pose_generation_router
+from api.signwriting_translation_pytorch import router as signwriting_translation_pytorch_router
+from api.simplify_text import router as simplify_text_router
+from api.pose_generation import router as pose_generation_router
+from api.transcribe import router as transcribe_router
 
 app = FastAPI()
 
@@ -43,7 +44,6 @@ if not os.path.exists(WHISPER_MODEL):
 
 logging.basicConfig(level=logging.DEBUG)
 
-from .api.transcribe import router as transcribe_router
 app.include_router(transcribe_router)
 
 app.include_router(signwriting_translation_pytorch_router)

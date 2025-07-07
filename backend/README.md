@@ -30,7 +30,6 @@ This backend provides the core API services for the SignBridge application, incl
 
 ## Setup
 
-For detailed step-by-step setup and run instructions on Windows, see [WINDOWS_SETUP.md](WINDOWS_SETUP.md).
 
 ### System Dependencies
 
@@ -42,33 +41,28 @@ For detailed step-by-step setup and run instructions on Windows, see [WINDOWS_SE
 - **Whisper.cpp Executable**: Required for speech-to-text transcription. You must build the `whisper.cpp` executable before running the backend. For detailed build instructions, see [`whisper.cpp/README.md`](../whisper.cpp/README.md).
   - After building, ensure the `whisper-cli` binary and model files are present in the `whisper.cpp/build/bin/` and `whisper.cpp/models/` directories, respectively.
 
-### Python 3.13 Environment (Basic)
+### Python 3.11 Environment
 
-```bash
-python3 -m venv backend/venv
-source backend/venv/bin/activate
-pip install -r backend/requirements.txt
-```
-
-### Python 3.11 Environment (For Text-to-SignWriting)
+- Make sure you on backend folder
 
 ```bash
 # Install Python 3.11 if not installed
 brew install python@3.11
 
 # Run setup script to create and activate Python 3.11 virtual environment and install dependencies
-./setup_py311_env.sh
+bash ./setup_py311_env.sh
 
 # Activate the Python 3.11 environment
 source py311_venv/bin/activate
+
 ```
 
 ## Running the Backend
 
-Activate the desired environment and run:
+When the desired environment is activated, run:
 
 ```bash
-uvicorn backend.main:app --reload
+uvicorn main:app --reload
 ```
 
 The backend will be available at `http://127.0.0.1:8000`.
