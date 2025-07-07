@@ -105,17 +105,6 @@ const SignWritingDisplay: React.FC<SignWritingDisplayProps> = ({ fswTokens }) =>
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header with count */}
-      <div className="flex items-center justify-between mb-3 px-1">
-        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-          {normalizedTokens.length} sign{normalizedTokens.length !== 1 ? 's' : ''}
-        </span>
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-          <span className="text-xs text-gray-600 dark:text-gray-400">Ready</span>
-        </div>
-      </div>
-
       {/* Signs Container */}
       <div className="flex-1">
         <div
@@ -147,15 +136,6 @@ const SignWritingDisplay: React.FC<SignWritingDisplayProps> = ({ fswTokens }) =>
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Footer with instructions */}
-      <div className="mt-2 px-1">
-        <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Hover for details • Scroll for more
-          </p>
         </div>
       </div>
 

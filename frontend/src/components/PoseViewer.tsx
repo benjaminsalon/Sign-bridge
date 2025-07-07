@@ -4,9 +4,10 @@ interface PoseViewerProps {
   poseFile?: Blob | Uint8Array;
   poseUrl?: string;
   onAnimationComplete?: () => void;
+  isTranslating?: boolean;
 }
 
-const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationComplete }) => {
+const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationComplete, isTranslating }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [url, setUrl] = useState<string | null>(poseUrl || null);
   const [loading, setLoading] = useState(false);
@@ -140,12 +141,12 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
       {/* Header with status */}
       <div className="flex items-center justify-between mb-4 px-2">
         <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-          3D Animation
+          Animation
         </span>
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+          <div className={`w-2 h-2 rounded-full ${isTranslating ? 'bg-orange-500 animate-pulse' : isPlaying ? 'bg-green-500 animate-pulse' : 'bg-green-500'}`}></div>
           <span className="text-xs text-gray-600 dark:text-gray-400">
-            {isPlaying ? 'Playing' : 'Ready'}
+            {isTranslating ? 'Loading' : isPlaying ? 'Playing' : 'Ready'}
           </span>
         </div>
       </div>
