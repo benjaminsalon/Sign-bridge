@@ -160,11 +160,6 @@ function App() {
       </div>
 
       <div className="mt-6">
-        <h2 className="text-xl font-semibold">SignWriting Animation:</h2>
-        {/* Show the animation video here */}
-      </div>
-
-      <div className="mt-6">
         <h2 className="text-xl font-semibold">2D Skeleton Animation (Online):</h2>
         {isGeneratingPose && (
           <div className="text-blue-600 mb-4">Generating pose file...</div>

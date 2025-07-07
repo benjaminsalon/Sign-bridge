@@ -11,17 +11,12 @@
   },
   "dependencies": {
     "@sutton-signwriting/sgnw-components": "^1.1.0",
-    "@tensorflow/tfjs": "^4.22.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
-    "@tensorflow/tfjs-core": "^4.22.0",
-    "@tensorflow/tfjs-layers": "^4.22.0",
     "@types/axios": "^0.9.36",
     "axios": "^1.10.0",
     "mp4-muxer": "^5.2.2",
     "pose-viewer": "^1.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "three": "^0.178.0",
     "webm-muxer": "^5.1.4"
   },
   "devDependencies": {
@@ -29,7 +24,6 @@
     "@types/dom-webcodecs": "^0.1.15",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@types/three": "^0.178.0",
     "@vitejs/plugin-react": "^4.5.2",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
