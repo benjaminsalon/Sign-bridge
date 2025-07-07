@@ -14,6 +14,7 @@ function App() {
   const [signWriting, setSignWriting] = useState<string[]>([]);
   const [poseFile, setPoseFile] = useState<Blob | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recordingSource, setRecordingSource] = useState<'mic' | 'system'>('mic');
@@ -95,6 +96,7 @@ function App() {
 
   const handleRecordComplete = async (audioBlob: Blob) => {
     setIsRecording(false);
+    setIsTranscribing(true);
     setError(null);
     setInputText('');
     setSignWriting([]);
@@ -110,9 +112,11 @@ function App() {
       );
       const originalText = transcribeResponse.data.text || '';
       setInputText(originalText);
+      setIsTranscribing(false);
       triggerTranslation(originalText);
     } catch {
       setError('Transcription failed. Please try again.');
+      setIsTranscribing(false);
     }
   };
 
@@ -217,20 +221,30 @@ function App() {
               </div>
               
               <div className="flex-1 flex flex-col pt-6">
-                <div className="relative flex-1">
-                  <textarea
-                    className="w-full h-full resize-none bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-200 text-base leading-relaxed"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Type your message here or use voice recording to get started..."
-                    aria-label="Input text for translation"
-                  />
-                  <div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-                    <span>{inputText.length} characters</span>
-                    <div className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-                    <span>Press Enter to translate</span>
+                {isTranscribing ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin mx-auto mb-4"></div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Processing voice recording...</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Converting speech to text</p>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="relative flex-1">
+                    <textarea
+                      className="w-full h-full resize-none bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-200 text-base leading-relaxed"
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder="Type your message here or use voice recording to get started..."
+                      aria-label="Input text for translation"
+                    />
+                    <div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                      <span>{inputText.length} characters</span>
+                      <div className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                      <span>Press Enter to translate</span>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Enhanced Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 mt-6">
@@ -239,7 +253,7 @@ function App() {
                     className="group relative flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     aria-pressed={isRecording}
                     aria-label="Start recording"
-                    disabled={isRecording}
+                    disabled={isRecording || isTranscribing}
                   >
                     <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                     <div className="relative flex items-center justify-center gap-3">
@@ -254,7 +268,7 @@ function App() {
                   
                   <button
                     onClick={() => triggerTranslation(inputText)}
-                    disabled={isTranslating || inputText.trim() === ''}
+                    disabled={isTranslating || isTranscribing || inputText.trim() === ''}
                     className="group relative flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     aria-label="Translate text"
                   >
