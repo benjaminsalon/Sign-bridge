@@ -30,6 +30,18 @@ This backend provides the core API services for the SignBridge application, incl
 
 ## Setup
 
+For detailed step-by-step setup and run instructions on Windows, see [WINDOWS_SETUP.md](WINDOWS_SETUP.md).
+
+### System Dependencies
+
+- **ffmpeg**: Required for audio file conversion in the /transcribe endpoint. Install it using your system package manager:
+  - macOS: `brew install ffmpeg`
+  - Ubuntu/Debian: `sudo apt-get install ffmpeg`
+  - Windows: [Download from ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH.
+
+- **Whisper.cpp Executable**: Required for speech-to-text transcription. You must build the `whisper.cpp` executable before running the backend. For detailed build instructions, see [`whisper.cpp/README.md`](../whisper.cpp/README.md).
+  - After building, ensure the `whisper-cli` binary and model files are present in the `whisper.cpp/build/bin/` and `whisper.cpp/models/` directories, respectively.
+
 ### Python 3.13 Environment (Basic)
 
 ```bash
@@ -80,5 +92,3 @@ Run tests using the appropriate Python environment.
 ## License
 
 This project is licensed under the MIT License.
-uvicorn backend.main:app --reload
-source py311_venv/bin/activate
