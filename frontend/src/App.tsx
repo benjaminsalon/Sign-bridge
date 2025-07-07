@@ -3,6 +3,8 @@ import axios from 'axios';
 import AudioRecorder from './components/AudioRecorder';
 import SignWritingDisplay from './components/SignWritingDisplay';
 import PoseViewer from './components/PoseViewer';
+import LoadingSpinner from './components/LoadingSpinner';
+import { useTheme } from './contexts/ThemeContext';
 import './index.css';
 
 function App() {
@@ -16,6 +18,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [recordingSource, setRecordingSource] = useState<'mic' | 'system'>('mic');
 
+  const { theme, toggleTheme } = useTheme();
   const translationTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -119,80 +122,222 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col">
-      <h1 className="text-3xl font-bold mb-4 text-center">SignBridge: Voice-to-Sign Translator</h1>
-      <div className="flex flex-1 gap-4 flex-row">
-        {/* Text Input Column */}
-        <div className="flex flex-col w-2/5">
-          <label htmlFor="textInput" className="mb-2 font-semibold">
-            Input Text (Type or from Speech)
+    <div className="min-h-screen transition-all duration-300">
+      {/* Header */}
+      <header className="glass border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gradient">
+                  SignBridge
+                </h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Voice-to-Sign Translator</p>
+              </div>
+            </div>
+            
+            {/* Header Controls */}
+            <div className="flex items-center gap-4">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? (
+                  <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+              
+              {/* Simplify Text Toggle */}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={simplifyText}
+                  onChange={(e) => setSimplifyText(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Simplify Text
+                </span>
           </label>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6" style={{height: 'calc(100vh - 140px)'}}>
+          
+          {/* Input Section - Larger */}
+          <div className="xl:col-span-5 h-full">
+            <div className="card h-full flex flex-col">
+              <div className="pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Input Text
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Type or speak your message to translate
+                </p>
+              </div>
+              <div className="flex-1 flex flex-col pt-4">
           <textarea
-            id="textInput"
-            className="flex-grow p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600"
+                  className="input flex-1 scrollable-container"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            rows={15}
+                  placeholder="Type your message here or use voice recording..."
             aria-label="Input text for translation"
           />
-          <div className="mt-2 flex items-center gap-4">
-            <button
-              onClick={handleRecordClick}
-              className={`px-4 py-2 rounded ${
-                isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-              } text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500`}
-              aria-pressed={isRecording}
-              aria-label={isRecording ? 'Stop recording' : 'Start recording'}
-            >
-              {isRecording ? 'Stop Recording' : 'Record Mic'}
+                
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <button
+                    onClick={handleRecordClick}
+                    className="btn flex-1 btn-success"
+                    aria-pressed={isRecording}
+                    aria-label="Start recording"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                    </svg>
+                    Record
+                  </button>
+                  
+                  <button
+                    onClick={() => triggerTranslation(inputText)}
+                    disabled={isTranslating || inputText.trim() === ''}
+                    className="btn btn-primary"
+                    aria-label="Translate text"
+                  >
+                    {isTranslating ? (
+                      <>
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Translating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                        Translate
+                      </>
+                    )}
             </button>
-            <button
-              onClick={() => setRecordingSource('system')}
-              className={`px-4 py-2 rounded ${
-                recordingSource === 'system' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-600 hover:bg-gray-700'
-              } text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-              aria-pressed={recordingSource === 'system'}
-              aria-label="Record system audio (UI only)"
-              disabled
-              title="System audio recording not yet implemented"
-            >
-              Record System Audio
-            </button>
-            <button
-              onClick={() => triggerTranslation(inputText)}
-              disabled={isTranslating || inputText.trim() === ''}
-              className="px-4 py-2 rounded bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
-              aria-label="Translate text"
-            >
-              &#8594; Translate
-            </button>
+                </div>
+              </div>
           </div>
         </div>
 
-        {/* SignWriting Bar (Vertical) */}
-        <div
-          className="w-2/5 overflow-y-auto border-l border-r border-gray-300 dark:border-gray-700 px-2 flex flex-col items-center"
-          style={{ writingMode: 'vertical-rl', textOrientation: 'upright' }}
-          aria-label="SignWriting notation display"
-          tabIndex={0}
-        >
+          {/* SignWriting Display - Smaller */}
+          <div className="xl:col-span-3 h-full">
+            <div className="card h-full flex flex-col">
+              <div className="pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  SignWriting
+                </h2>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Visual notation
+                </p>
+              </div>
+              <div className="flex-1 pt-4">
+                {isTranslating ? (
+                  <div className="h-full flex items-center justify-center">
+                    <LoadingSpinner size="md" text="Translating..." />
+                  </div>
+                ) : (
+                  <div className="h-full scrollable-container">
           <SignWritingDisplay fswTokens={signWriting} />
-        </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-        {/* Animation Display */}
-        <div className="w-1/5 flex flex-col items-center justify-center border border-gray-300 dark:border-gray-700 rounded p-2">
-          <h2 className="mb-2 font-semibold">Animation</h2>
-          {poseFile ? (
+          {/* Animation Section - Larger */}
+          <div className="xl:col-span-4 h-full">
+            <div className="card h-full flex flex-col">
+              <div className="pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Animation
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Animated sign language
+                </p>
+              </div>
+              <div className="flex-1 flex items-center justify-center pt-4">
+                {isTranslating ? (
+                  <LoadingSpinner size="lg" text="Generating animation..." />
+                ) : poseFile ? (
+                  <div className="w-full h-full flex items-center justify-center">
             <PoseViewer poseFile={poseFile} onAnimationComplete={() => {}} />
-          ) : (
-            <div className="text-gray-500 italic">No animation available</div>
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500 dark:text-gray-400">
+                    <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm">No animation available</p>
+                    <p className="text-xs mt-1">Translate text to see animation</p>
+                  </div>
           )}
         </div>
       </div>
+          </div>
+        </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="mt-6 animate-fade-in">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <span className="text-red-800 dark:text-red-200 font-medium">{error}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Transcription Display */}
+        {transcription && (
+          <div className="mt-6 animate-fade-in">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="text-blue-800 dark:text-blue-200 font-medium mb-1">Transcription</p>
+                  <p className="text-blue-700 dark:text-blue-300 text-sm">{transcription}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Audio Recorder Component */}
       {isRecording && (
         <AudioRecorder
           onRecordingComplete={handleRecordComplete}
+          recordingSource={recordingSource}
+          setRecordingSource={setRecordingSource}
         />
       )}
     </div>
