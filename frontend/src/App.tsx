@@ -338,6 +338,7 @@ function App() {
           onRecordingComplete={handleRecordComplete}
           recordingSource={recordingSource}
           setRecordingSource={setRecordingSource}
+          onClose={() => setIsRecording(false)}
         />
       )}
     </div>

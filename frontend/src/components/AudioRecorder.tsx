@@ -4,9 +4,10 @@ interface AudioRecorderProps {
   onRecordingComplete: (audioBlob: Blob) => void;
   recordingSource: 'mic' | 'system';
   setRecordingSource: (source: 'mic' | 'system') => void;
+  onClose: () => void;
 }
 
-const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, recordingSource, setRecordingSource }) => {
+const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, recordingSource, setRecordingSource, onClose }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -107,8 +108,23 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 min-w-[340px]">
+    <>
+      {/* Blur overlay for entire page */}
+      <div className="fixed inset-0 bg-black/20 backdrop-blur-md z-40 animate-fade-in"></div>
+      
+            {/* Modal positioned in first card */}
+      <div className="fixed top-1/2 left-[25%] transform -translate-x-1/2 -translate-y-1/2 z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 min-w-[340px] relative">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            aria-label="Close recording modal"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`}></div>
@@ -211,6 +227,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
         </div>
       </div>
     </div>
+    </>
   );
 };
 
