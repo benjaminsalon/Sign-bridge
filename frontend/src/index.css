@@ -41,21 +41,24 @@
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
   --bg-card: #ffffff;
-  --bg-overlay: rgba(255, 255, 255, 0.9);
+  --bg-card-gradient-start: #ffffff;
+  --bg-card-gradient-end: #f1f5f9;
+  --bg-overlay: rgba(255, 255, 255, 0.95);
   --bg-gradient-start: #f0f9ff;
   --bg-gradient-middle: #ffffff;
   --bg-gradient-end: #faf5ff;
   
   /* Text Colors - Light Mode */
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --text-muted: #94a3b8;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #475569;
+  --text-muted: #64748b;
   
   /* Border Colors - Light Mode */
   --border-primary: #e2e8f0;
   --border-secondary: #cbd5e1;
   --border-focus: #3b82f6;
+  --border-hover: #cbd5e1;
   
   /* Shadow Colors */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -63,10 +66,12 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   
-  --page-bg: #f4f6fb;
+  --page-bg: #f8fafc;
   --card-bg: #fff;
-  --card-border: #e0e3ea;
-  --card-shadow: 0 4px 24px 0 rgba(30, 41, 59, 0.07);
+  --card-bg-gradient-start: #ffffff;
+  --card-bg-gradient-end: #f1f5f9;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 4px 24px 0 rgba(30, 41, 59, 0.08);
   --card-radius: 1.25rem;
   --input-bg: #fff;
   --input-border: #d1d5db;
@@ -82,6 +87,8 @@
   --bg-secondary: #1e293b;
   --bg-tertiary: #334155;
   --bg-card: #1e293b;
+  --bg-card-gradient-start: #1e293b;
+  --bg-card-gradient-end: #0f172a;
   --bg-overlay: rgba(15, 23, 42, 0.9);
   --bg-gradient-start: #0f172a;
   --bg-gradient-middle: #1e293b;
@@ -95,9 +102,12 @@
   --border-primary: #334155;
   --border-secondary: #475569;
   --border-focus: #60a5fa;
+  --border-hover: #475569;
   
   --page-bg: #0f172a;
   --card-bg: #1e293b;
+  --card-bg-gradient-start: #1e293b;
+  --card-bg-gradient-end: #0f172a;
   --card-border: #334155;
   --card-shadow: 0 4px 24px 0 rgba(15, 23, 42, 0.25);
   --card-radius: 1.25rem;
@@ -140,7 +150,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--page-bg);
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary);
     transition: background 0.3s, color 0.3s;
     min-height: 100vh;
   }
@@ -245,10 +255,11 @@
   
   .btn-secondary:hover {
     background: var(--bg-tertiary);
+    border-color: var(--border-hover);
   }
   
   .card {
-    background: var(--card-bg);
+    background: linear-gradient(135deg, var(--card-bg-gradient-start), var(--card-bg-gradient-end));
     border: 1.5px solid var(--card-border);
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
@@ -262,12 +273,13 @@
   .card:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
+    border-color: var(--border-hover);
   }
   
   .input {
     @apply w-full px-3 py-2 text-base border-2 rounded-lg transition-all duration-200;
     background: var(--input-bg);
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary);
     border-color: var(--input-border);
     min-height: 120px;
     max-height: 350px;
@@ -277,7 +289,7 @@
   .input:focus {
     outline: none;
     border-color: var(--input-focus);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.06);
   }
   
   .input::placeholder {
@@ -288,6 +300,7 @@
     background: var(--bg-overlay);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-primary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   }
   
   .loading-spinner {
@@ -316,6 +329,7 @@
     min-height: 120px;
     border-radius: 0.75rem;
     background: var(--input-bg);
+    border: 1px solid var(--border-primary);
   }
   
   .scrollable-container::-webkit-scrollbar {

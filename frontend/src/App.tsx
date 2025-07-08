@@ -201,7 +201,7 @@ function App() {
           
           {/* Input Section - Enhanced */}
           <div className="xl:col-span-5 h-full">
-            <div className="card h-full flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+            <div className="card h-full flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 border-0">
               <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -298,7 +298,7 @@ function App() {
 
           {/* SignWriting Display - Enhanced */}
           <div className="xl:col-span-3 h-full">
-            <div className="card h-full flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+            <div className="card h-full flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 border-0">
               <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
@@ -361,7 +361,7 @@ function App() {
 
           {/* Animation Section - Enhanced */}
           <div className="xl:col-span-4 h-full">
-            <div className="card h-full flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+            <div className="card h-full flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 border-0">
               <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
