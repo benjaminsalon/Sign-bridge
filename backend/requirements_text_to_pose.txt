@@ -1,0 +1,4 @@
+pose-format>=0.4.1
+numpy
+scipy
+simplemma>=1.0.0

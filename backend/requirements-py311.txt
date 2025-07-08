@@ -5,3 +5,10 @@ torch==2.0.1
 signwriting-translation @ git+https://github.com/sign-language-processing/signwriting-translation.git
 requests
 python-dotenv
+pydub
+pose-format>=0.4.1
+numpy
+scipy
+simplemma>=1.0.0
+git+https://github.com/ZurichNLP/spoken-to-signed-translation.git
+sign-language-datasets
