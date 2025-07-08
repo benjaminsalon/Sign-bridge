@@ -141,11 +141,11 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
       
             {/* Modal positioned in first card */}
       <div className="fixed top-1/2 left-[25%] transform -translate-x-1/2 -translate-y-1/2 z-50">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 min-w-[340px] relative">
+        <div className="bg-theme-modal rounded-2xl shadow-2xl border border-theme-modal p-6 min-w-[340px] relative">
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            className="absolute top-4 right-4 p-2 rounded-lg bg-secondary-100 hover:bg-secondary-200 transition-colors duration-200 text-theme-secondary hover:text-theme-primary"
             aria-label="Close recording modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,13 +154,13 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
           </button>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`}></div>
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-danger-500 animate-pulse' : 'bg-secondary-400'}`}></div>
+            <span className="font-semibold text-theme-primary">
               {isRecording ? 'Recording...' : 'Ready to Record'}
             </span>
           </div>
           {isRecording && (
-            <div className="text-sm font-mono text-gray-600 dark:text-gray-400">
+            <div className="text-sm font-mono text-theme-secondary">
               {formatTime(recordingTime)}
             </div>
           )}
@@ -170,7 +170,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
         <div className="flex justify-center gap-4 mb-4">
           <button
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-150
-              ${recordingSource === 'mic' ? 'bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200' : 'bg-gray-100 border-gray-300 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}
+              ${recordingSource === 'mic' ? 'bg-primary-100 border-primary-400 text-primary-700' : 'bg-secondary-100 border-secondary-300 text-secondary-500'}
             `}
             onClick={() => setRecordingSource('mic')}
             disabled={isRecording}
@@ -179,7 +179,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
             Microphone
           </button>
           <button
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-150 opacity-60 cursor-not-allowed bg-gray-100 border-gray-300 text-gray-400 dark:bg-gray-700 dark:text-gray-500`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-150 opacity-60 cursor-not-allowed bg-secondary-100 border-secondary-300 text-secondary-400`}
             disabled
             title="System audio recording not yet implemented"
           >
@@ -195,10 +195,10 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
               {Array.from({ length: 20 }, (_, i) => (
                 <div
                   key={i}
-                  className="w-1 bg-gray-300 dark:bg-gray-600 rounded-full transition-all duration-75"
+                  className="w-1 bg-secondary-300 rounded-full transition-all duration-75"
                   style={{
                     height: `${Math.max(4, (audioLevel / 255) * 32 * Math.random())}px`,
-                    backgroundColor: audioLevel > 100 ? '#ef4444' : '#3b82f6'
+                    backgroundColor: audioLevel > 100 ? 'var(--danger-500)' : 'var(--primary-500)'
                   }}
                 />
               ))}
@@ -208,7 +208,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
 
         {/* Recording Instructions */}
         <div className="text-center mb-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-theme-secondary">
             {isRecording 
               ? 'Speak clearly into your microphone' 
               : 'Click the button below to start recording'
@@ -222,8 +222,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
             onClick={() => setIsRecording(!isRecording)}
             className={`relative group transition-all duration-300 ${
               isRecording 
-                ? 'bg-red-500 hover:bg-red-600 scale-110' 
-                : 'bg-blue-500 hover:bg-blue-600 hover:scale-105'
+                ? 'bg-danger-500 hover:bg-danger-600 scale-110' 
+                : 'bg-primary-500 hover:bg-primary-600 hover:scale-105'
             } text-white rounded-full p-4 shadow-lg hover:shadow-xl`}
           >
             {isRecording ? (
@@ -237,15 +237,15 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
             )}
             <div className={`absolute inset-0 rounded-full ${
               isRecording 
-                ? 'bg-red-400 animate-ping opacity-75' 
-                : 'bg-blue-400 opacity-0 group-hover:opacity-50 transition-opacity'
+                ? 'bg-danger-400 animate-ping opacity-75' 
+                : 'bg-primary-400 opacity-0 group-hover:opacity-50 transition-opacity'
             }`}></div>
           </button>
         </div>
 
         {/* Status Text */}
         <div className="text-center mt-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-theme-muted">
             {isRecording 
               ? 'Click to stop recording' 
               : 'Your voice will be transcribed automatically'

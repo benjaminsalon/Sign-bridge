@@ -27,7 +27,7 @@ const AudioPlayback = ({ audioUrl }: { audioUrl: string | null }) => (
 const SignWritingPanel = ({ signWriting }: { signWriting: string[] }) => (
   <div className="mt-6">
     <h2 className="text-xl font-semibold">SignWriting Notation (FSW):</h2>
-    <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded overflow-x-auto">
+    <pre className="bg-theme-secondary p-4 rounded overflow-x-auto">
       {signWriting.join(' ')}
     </pre>
     <div className="mt-6">
@@ -50,7 +50,7 @@ const AnimationPanel = ({ isGeneratingPose, poseFile }: { isGeneratingPose: bool
       />
     )}
     {!isGeneratingPose && !poseFile && (
-      <div className="text-gray-500 italic">No pose file available. Record audio to generate animation.</div>
+      <div className="text-theme-muted italic">No pose file available. Record audio to generate animation.</div>
     )}
   </div>
 );
@@ -183,7 +183,7 @@ function LegacyAppFlow() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
+    <div className="min-h-screen bg-theme-page text-theme-primary p-4">
       <h1 className="text-3xl font-bold mb-4">SignBridge: Voice-to-Sign Translator (Advanced View)</h1>
       <AudioRecorder onRecordingComplete={handleRecordingComplete} />
       <AudioPlayback audioUrl={audioUrl} />
