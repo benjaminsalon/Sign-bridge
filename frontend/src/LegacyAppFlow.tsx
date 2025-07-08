@@ -109,7 +109,7 @@ function LegacyAppFlow() {
     try {
       // 1. Transcribe audio
       const transcribeResponse = await axios.post<{ text: string }>(
-        'http://127.0.0.1:8000/transcribe',
+        'http://1c1a669a63e8.ngrok-free.app/transcribe',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -120,7 +120,7 @@ function LegacyAppFlow() {
       // 2. Optionally simplify text
       if (simplifyText && originalText) {
         const simplifyResponse = await axios.post<{ simplified_text: string }>(
-          'http://127.0.0.1:8000/simplify_text',
+          'http://1c1a669a63e8.ngrok-free.app/simplify_text',
           { text: originalText }
         );
         textToTranslate = simplifyResponse.data.simplified_text || originalText;
@@ -130,7 +130,7 @@ function LegacyAppFlow() {
       // 3. Translate to SignWriting
       if (textToTranslate) {
         const translateResponse = await axios.post<{ signwriting: string }>(
-          'http://127.0.0.1:8000/translate_signwriting',
+          'http://1c1a669a63e8.ngrok-free.app/translate_signwriting',
           { text: textToTranslate }
         );
         const rawFsw = translateResponse.data.signwriting || '';
@@ -141,7 +141,7 @@ function LegacyAppFlow() {
         setIsGeneratingPose(true);
         try {
           const poseResponse = await axios.post<{ pose_data: string; data_format: string }>(
-            'http://127.0.0.1:8000/generate_pose',
+            'http://1c1a669a63e8.ngrok-free.app/generate_pose',
             {
               text: textToTranslate,
               spoken_language: 'en',

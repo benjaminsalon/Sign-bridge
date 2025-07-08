@@ -87,7 +87,7 @@ function App() {
       let textToTranslate = text;
       if (simplifyText) {
         const simplifyResponse = await axios.post<{ simplified_text: string }>(
-          'http://127.0.0.1:8000/simplify_text',
+          'http://1c1a669a63e8.ngrok-free.app/simplify_text',
           { text }
         );
         textToTranslate = simplifyResponse.data.simplified_text || text;
@@ -95,7 +95,7 @@ function App() {
       
       // 1. Translate to SignWriting
       const translateResponse = await axios.post<{ signwriting: string }>(
-        'http://127.0.0.1:8000/translate_signwriting',
+        'http://1c1a669a63e8.ngrok-free.app/translate_signwriting',
         { text: textToTranslate }
       );
       const rawFsw = translateResponse.data.signwriting || '';
@@ -107,7 +107,7 @@ function App() {
       if (fswTokens.length > 0) {
         try {
           const poseResponse = await axios.post<{ pose_data: string; data_format: string }>(
-            'http://127.0.0.1:8000/generate_pose',
+            'http://1c1a669a63e8.ngrok-free.app/generate_pose',
             {
               text: textToTranslate,
               spoken_language: 'en',
@@ -155,7 +155,7 @@ function App() {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
       const transcribeResponse = await axios.post<{ text: string }>(
-        'http://127.0.0.1:8000/transcribe',
+        'http://1c1a669a63e8.ngrok-free.app/transcribe',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -179,7 +179,7 @@ function App() {
     setIsTranslating(true);
     try {
       const response = await axios.post<{ simplified_text: string }>(
-        'http://127.0.0.1:8000/simplify_text',
+        'http://1c1a669a63e8.ngrok-free.app/simplify_text',
         { text: inputText }
       );
       setSimplifiedText(response.data.simplified_text || inputText);
