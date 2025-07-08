@@ -22,7 +22,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       <div className={`loading-spinner ${sizeClasses[size]}`}></div>
       {text && (
         <div className="text-center">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <p className="text-sm font-medium text-theme-secondary mb-2">
             {text}
           </p>
           <div className="loading-dots">

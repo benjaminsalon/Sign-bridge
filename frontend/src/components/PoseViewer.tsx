@@ -82,13 +82,10 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 mb-4 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-            <svg className="w-6 h-6 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+          <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-full" style={{ background: 'var(--bg-primary)' }}>
+            <div className="w-6 h-6 loading-spinner" style={{borderTopColor: 'var(--primary-500)', borderRightColor: 'var(--primary-500)', borderWidth: '2px'}}></div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+          <p className="text-sm text-theme-secondary font-medium">
             Loading Animation Viewer...
           </p>
         </div>
@@ -100,15 +97,15 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 mb-4 bg-red-100 dark:bg-red-900/20 rounded-full">
-            <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-full" style={{ background: 'var(--bg-danger)' }}>
+            <svg className="w-6 h-6 text-danger-600 dark:text-danger-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
           </div>
-          <p className="text-sm text-red-600 dark:text-red-400 font-medium mb-2">
+          <p className="text-sm text-danger-600 font-medium mb-2">
             {error}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-theme-muted">
             Try translating again
           </p>
         </div>
@@ -120,15 +117,15 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full" style={{ background: 'var(--bg-secondary)' }}>
+            <svg className="w-8 h-8 text-secondary-400 dark:text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium mb-1">
+          <p className="text-sm text-theme-secondary font-medium mb-1">
             No Animation Available
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-theme-muted">
             Translate text to see 3D animation
           </p>
         </div>
@@ -140,19 +137,19 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
     <div className="h-full flex flex-col">
       {/* Header with status */}
       <div className="flex items-center justify-between mb-4 px-2">
-        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+        <span className="text-xs font-medium text-theme-secondary">
           Animation
         </span>
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isTranslating ? 'bg-orange-500 animate-pulse' : isPlaying ? 'bg-green-500 animate-pulse' : 'bg-green-500'}`}></div>
-          <span className="text-xs text-gray-600 dark:text-gray-400">
+          <div className={`w-2 h-2 rounded-full ${isTranslating ? 'bg-warning-500 animate-pulse' : isPlaying ? 'bg-success-500 animate-pulse' : 'bg-success-500'}`}></div>
+          <span className="text-xs text-theme-secondary">
             {isTranslating ? 'Loading' : isPlaying ? 'Playing' : 'Ready'}
           </span>
         </div>
       </div>
 
       {/* Animation Container */}
-      <div className="flex-1 relative overflow-hidden rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <div className="flex-1 relative overflow-hidden rounded-lg bg-theme-secondary border border-theme-primary">
         <div ref={containerRef} className="pose-viewer-container h-full w-full">
           <pose-viewer
             src={url}
@@ -181,7 +178,7 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
                 }
               }
             }}
-            className="text-white hover:text-gray-300 transition-colors"
+            className="text-white hover:text-white/70 transition-colors"
             title={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
@@ -203,7 +200,7 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
                 poseViewer.play();
               }
             }}
-            className="text-white hover:text-gray-300 transition-colors"
+            className="text-white hover:text-white/70 transition-colors"
             title="Restart"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -216,7 +213,7 @@ const PoseViewer: React.FC<PoseViewerProps> = ({ poseFile, poseUrl, onAnimationC
       {/* Footer with instructions */}
       <div className="mt-4 px-2">
         <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-theme-muted">
             Use controls to play/pause/restart animation
           </p>
         </div>

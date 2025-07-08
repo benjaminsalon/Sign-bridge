@@ -351,7 +351,7 @@ const SkeletonAnimation: React.FC<SkeletonAnimationProps> = ({
         {isVideoReady && (
           <div className="text-green-600 mb-2">✅ Animation ready!</div>
         )}
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-theme-secondary">
           Frames: {poseData.length} | FPS: {fps}
         </span>
       </div>
