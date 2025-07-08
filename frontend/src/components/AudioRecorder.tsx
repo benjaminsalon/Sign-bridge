@@ -40,7 +40,52 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
 
   const startRecording = async () => {
     if (recordingSource === 'system') {
-      setIsRecording(false);
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        alert('System audio recording is not supported in this environment.');
+        setIsRecording(false);
+        return;
+      }
+      try {
+        const displayStream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true });
+        const audioTracks = displayStream.getAudioTracks();
+        if (audioTracks.length === 0) {
+          alert('No system audio track available.');
+          setIsRecording(false);
+          return;
+        }
+        const audioStream = new MediaStream(audioTracks);
+        // Check for supported MIME type
+        let mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            mimeType = 'audio/webm;codecs=opus';
+          } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+            mimeType = 'audio/ogg;codecs=opus';
+          } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+            mimeType = 'audio/wav';
+          } else {
+            mimeType = '';
+          }
+        }
+        mediaRecorderRef.current = new MediaRecorder(audioStream, mimeType ? { mimeType } : undefined);
+        mediaRecorderRef.current.ondataavailable = event => {
+          audioChunksRef.current.push(event.data);
+        };
+        mediaRecorderRef.current.onstop = () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          onRecordingComplete(audioBlob);
+          audioChunksRef.current = [];
+        };
+        mediaRecorderRef.current.start();
+        setRecordingTime(0);
+        timerRef.current = setInterval(() => {
+          setRecordingTime(prev => prev + 1);
+        }, 1000);
+      } catch (error) {
+        console.error('Error accessing system audio:', error);
+        alert('Failed to capture system audio. Please check permissions.');
+        setIsRecording(false);
+      }
       return;
     }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -179,9 +224,11 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
             Microphone
           </button>
           <button
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-150 opacity-60 cursor-not-allowed bg-secondary-100 border-secondary-300 text-secondary-400`}
-            disabled
-            title="System audio recording not yet implemented"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-150
+              ${recordingSource === 'system' ? 'bg-primary-100 border-primary-400 text-primary-700' : 'bg-secondary-100 border-secondary-300 text-secondary-500'}
+            `}
+            onClick={() => setRecordingSource('system')}
+            disabled={isRecording}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1z" /></svg>
             System Audio
