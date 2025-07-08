@@ -40,7 +40,11 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
 
   const startRecording = async () => {
     if (recordingSource === 'system') {
-      // Not implemented
+      setIsRecording(false);
+      return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Audio recording is not supported in this environment. Please check your Tauri/macOS version and permissions.');
       setIsRecording(false);
       return;
     }
@@ -61,7 +65,22 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
         animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
       };
       updateAudioLevel();
-      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+      // Check for supported MIME type
+      let mimeType = 'audio/webm';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          mimeType = 'audio/webm;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+          mimeType = 'audio/ogg;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+          mimeType = 'audio/wav';
+        } else {
+          mimeType = '';
+        }
+      }
+
+      mediaRecorderRef.current = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       mediaRecorderRef.current.ondataavailable = event => {
         audioChunksRef.current.push(event.data);
       };
@@ -84,6 +103,14 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, reco
       }, 1000);
     } catch (error) {
       console.error('Error accessing microphone:', error);
+      if (
+        error &&
+        typeof error === 'object' &&
+        'name' in error &&
+        (error as any).name === 'NotAllowedError'
+      ) {
+        alert('Microphone access was denied. Please enable it in your system settings.');
+      }
       setIsRecording(false);
     }
   };
