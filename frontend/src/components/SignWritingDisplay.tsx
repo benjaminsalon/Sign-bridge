@@ -71,7 +71,7 @@ const SignWritingDisplay: React.FC<SignWritingDisplayProps> = ({ fswTokens }) =>
     }
     // Compose a single SVG string
     let y = 0;
-    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${maxWidth}" height="${totalHeight}" viewBox="0 0 ${maxWidth} ${totalHeight}">
+    const svgContent = `<svg xmlns="https://www.w3.org/2000/svg" width="${maxWidth}" height="${totalHeight}" viewBox="0 0 ${maxWidth} ${totalHeight}">
 ` +
       svgData.map(({svg, width, height}) => {
         const svgStr = svg.outerHTML
