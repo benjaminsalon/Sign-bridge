@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import SignWritingService from '../services/SignWritingService';
-
-
 
 interface SignWritingDisplayProps {
   fswTokens: string[];
@@ -11,6 +9,7 @@ const SignWritingDisplay: React.FC<SignWritingDisplayProps> = ({ fswTokens }) =>
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [normalizedTokens, setNormalizedTokens] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadFonts = async () => {
@@ -44,6 +43,57 @@ const SignWritingDisplay: React.FC<SignWritingDisplayProps> = ({ fswTokens }) =>
     };
     normalizeTokens();
   }, [fswTokens, fontsLoaded]);
+
+  // Save as Image handler
+  const handleSaveAsImage = async () => {
+    if (!containerRef.current) return;
+    // Get all <fsw-sign> elements
+    const fswSigns = Array.from(containerRef.current.querySelectorAll('fsw-sign'));
+    if (fswSigns.length === 0) return;
+    // Wait a tick to ensure all SVGs are rendered
+    await new Promise(r => setTimeout(r, 50));
+    // Extract SVGs from shadow DOM of each <fsw-sign>
+    let maxWidth = 0;
+    let totalHeight = 0;
+    const svgData: {svg: SVGSVGElement, width: number, height: number}[] = [];
+    for (const el of fswSigns) {
+      // @ts-ignore
+      const shadow = el.shadowRoot;
+      if (!shadow) continue;
+      const svg = shadow.querySelector('svg');
+      if (!svg) continue;
+      const vb = svg.getAttribute('viewBox')?.split(' ').map(Number) || [0,0,100,100];
+      const width = vb[2];
+      const height = vb[3];
+      maxWidth = Math.max(maxWidth, width);
+      totalHeight += height;
+      svgData.push({svg, width, height});
+    }
+    // Compose a single SVG string
+    let y = 0;
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${maxWidth}" height="${totalHeight}" viewBox="0 0 ${maxWidth} ${totalHeight}">
+` +
+      svgData.map(({svg, width, height}) => {
+        const svgStr = svg.outerHTML
+          .replace('<svg ', `<g transform=\"translate(0,${y})\" `)
+          .replace('</svg>', '</g>');
+        y += height;
+        return svgStr;
+      }).join('\n') +
+      '\n</svg>';
+    // Download as SVG file
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'signwriting.svg';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  };
 
   if (loading) {
     return (
@@ -102,10 +152,23 @@ const SignWritingDisplay: React.FC<SignWritingDisplayProps> = ({ fswTokens }) =>
 
   return (
     <div className="h-full flex flex-col">
+      {/* Save as Image Button */}
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={handleSaveAsImage}
+          title="Save all as image"
+          className="p-2 rounded hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
       {/* Signs Container */}
       <div className="flex-1">
         <div
           id="signwriting-container"
+          ref={containerRef}
           className="flex flex-col items-center space-y-4 p-2"
           style={{
             fontSize: '24px',
