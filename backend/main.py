@@ -34,14 +34,6 @@ app.add_middleware(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..")) 
 
-WHISPER_EXECUTABLE = os.path.join(PROJECT_ROOT, "whisper.cpp/build/bin/whisper-cli")
-WHISPER_MODEL = os.path.join(PROJECT_ROOT, "whisper.cpp/models/ggml-base.en.bin")
-
-if not os.path.exists(WHISPER_EXECUTABLE):
-    raise FileNotFoundError(f"Whisper executable not found at: {WHISPER_EXECUTABLE}")
-if not os.path.exists(WHISPER_MODEL):
-    raise FileNotFoundError(f"Whisper model not found at: {WHISPER_MODEL}")
-
 logging.basicConfig(level=logging.DEBUG)
 
 app.include_router(transcribe_router)

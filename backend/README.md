@@ -4,7 +4,7 @@
 
 This backend provides the core API services for the SignBridge application, including:
 
-- Offline speech-to-text transcription using Whisper.cpp
+- Offline speech-to-text transcription using the Python Whisper library
 - Optional online text simplification via Groq API
 - Text-to-SignWriting translation using the signwriting-translation package with PyTorch
 
@@ -14,7 +14,7 @@ This backend provides the core API services for the SignBridge application, incl
 
 - Accepts: WAV audio file (multipart/form-data)
 - Returns: JSON with transcribed text
-- Uses: Whisper.cpp executable for offline transcription
+- Uses: Python Whisper library for offline transcription
 
 ### POST /simplify_text
 
@@ -30,7 +30,6 @@ This backend provides the core API services for the SignBridge application, incl
 
 ## Setup
 
-
 ### System Dependencies
 
 - **ffmpeg**: Required for audio file conversion in the /transcribe endpoint. Install it using your system package manager:
@@ -38,12 +37,11 @@ This backend provides the core API services for the SignBridge application, incl
   - Ubuntu/Debian: `sudo apt-get install ffmpeg`
   - Windows: [Download from ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH.
 
-- **Whisper.cpp Executable**: Required for speech-to-text transcription. You must build the `whisper.cpp` executable before running the backend. For detailed build instructions, see [`whisper.cpp/README.md`](../whisper.cpp/README.md).
-  - After building, ensure the `whisper-cli` binary and model files are present in the `whisper.cpp/build/bin/` and `whisper.cpp/models/` directories, respectively.
+- **Python Whisper Library**: Used for speech-to-text transcription. The backend will automatically download the required model files on first use.
 
 ### Python 3.11 Environment
 
-- Make sure you on backend folder
+- Make sure you are in the backend folder
 
 ```bash
 # Install Python 3.11 if not installed
@@ -54,7 +52,6 @@ bash ./setup_py311_env.sh
 
 # Activate the Python 3.11 environment
 source py311_venv/bin/activate
-
 ```
 
 ## Running the Backend
@@ -69,8 +66,8 @@ The backend will be available at `http://127.0.0.1:8000`.
 
 ## Notes
 
-- The Whisper.cpp executable and model files must be present in the `whisper.cpp` directory.
-- The Groq API key and URL should be configured in a `.env` file in the project root.
+- The Python Whisper library will download model files as needed on first use.
+- The Groq API key and URL should be configured in a `.env` file in the project root see `.env.example`.
 - The text-to-SignWriting translation requires the Python 3.11 environment due to PyTorch compatibility.
 
 ## Testing
