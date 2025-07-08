@@ -7,6 +7,34 @@ import LoadingSpinner from './components/LoadingSpinner';
 import { useTheme } from './contexts/ThemeContext';
 import './index.css';
 
+// Simple Modal for text choice
+const SimplifyChoiceModal = ({ original, simplified, onSelect, onClose }: { original: string, simplified: string, onSelect: (choice: 'original' | 'simplified') => void, onClose: () => void }) => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white dark:bg-theme-modal rounded-xl shadow-2xl p-6 max-w-lg w-full relative">
+      <button onClick={onClose} className="absolute top-3 right-3 text-theme-secondary hover:text-theme-primary">✕</button>
+      <h2 className="text-lg font-bold mb-4">Choose Text for Translation</h2>
+      <div className="mb-4">
+        <div className="mb-2 font-semibold">Original:</div>
+        <div className="p-2 bg-theme-secondary rounded mb-4 whitespace-pre-wrap">{original}</div>
+        <div className="mb-2 font-semibold">Simplified:</div>
+        <div className="p-2 bg-primary-50 dark:bg-primary-900 dark:text-white rounded whitespace-pre-wrap">{simplified}</div>
+      </div>
+      <div className="text-xs font-bold mb-4" style={{ color: 'var(--success-600, #16a34a)' }}>
+        This simplification is powered by <span style={{ color: 'var(--danger-600, #dc2626)' }}>Grok</span> and <span style={{ color: 'var(--danger-600, #dc2626)' }}>Llama AI</span> models.
+      </div>
+      <div className="flex gap-4 justify-end mt-6">
+        <button
+          onClick={() => onSelect('original')}
+          className="px-4 py-2 rounded bg-secondary-200 hover:bg-secondary-300 text-theme-primary font-semibold dark:bg-secondary-800 dark:hover:bg-secondary-700 dark:text-white"
+        >
+          Use Original
+        </button>
+        <button onClick={() => onSelect('simplified')} className="px-4 py-2 rounded bg-primary-500 hover:bg-primary-600 text-white font-semibold">Use Simplified</button>
+      </div>
+    </div>
+  </div>
+);
+
 function App() {
   const [inputText, setInputText] = useState('');
   const [transcription, setTranscription] = useState('');
@@ -20,6 +48,9 @@ function App() {
   const [isGeneratingAnimation, setIsGeneratingAnimation] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recordingSource, setRecordingSource] = useState<'mic' | 'system'>('mic');
+  const [showSimplifyModal, setShowSimplifyModal] = useState(false);
+  const [simplifiedText, setSimplifiedText] = useState('');
+  const [pendingOriginalText, setPendingOriginalText] = useState('');
 
   const { theme, toggleTheme } = useTheme();
   const translationTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -34,11 +65,13 @@ function App() {
       setTranscription('');
       return;
     }
-    translationTimeout.current = setTimeout(() => {
-      if (/[.!?\n]$/.test(inputText.trim())) {
-        triggerTranslation(inputText);
-      }
-    }, 1500);
+    if (!simplifyText) {
+      translationTimeout.current = setTimeout(() => {
+        if (/[.!?\n]$/.test(inputText.trim())) {
+          triggerTranslation(inputText);
+        }
+      }, 1500);
+    }
   }, [inputText]);
 
   const triggerTranslation = async (text: string) => {
@@ -139,6 +172,34 @@ function App() {
   const handleRecordClick = () => {
     setError(null);
     setIsRecording(!isRecording);
+  };
+
+  const handleSimplifyAndTranslate = async () => {
+    setError(null);
+    setIsTranslating(true);
+    try {
+      const response = await axios.post<{ simplified_text: string }>(
+        'http://127.0.0.1:8000/simplify_text',
+        { text: inputText }
+      );
+      setSimplifiedText(response.data.simplified_text || inputText);
+      setPendingOriginalText(inputText);
+      setShowSimplifyModal(true);
+    } catch {
+      setError('Failed to simplify text.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const handleSimplifyModalSelect = (choice: 'original' | 'simplified') => {
+    setShowSimplifyModal(false);
+    if (choice === 'simplified') {
+      setInputText(simplifiedText);
+      setTimeout(() => triggerTranslation(simplifiedText), 0);
+    } else {
+      setTimeout(() => triggerTranslation(pendingOriginalText), 0);
+    }
   };
 
   return (
@@ -283,17 +344,17 @@ function App() {
                   </button>
                   
                   <button
-                    onClick={() => triggerTranslation(inputText)}
+                    onClick={simplifyText ? handleSimplifyAndTranslate : () => triggerTranslation(inputText)}
                     disabled={isTranslating || isTranscribing || inputText.trim() === ''}
                     className="group relative flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    aria-label="Translate text"
+                    aria-label={simplifyText ? 'Simplify and translate text' : 'Translate text'}
                   >
                     <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                     <div className="relative flex items-center justify-center gap-3">
                       {isTranslating ? (
                         <>
                           <div className="w-5 h-5 loading-spinner" style={{borderTopColor: 'white', borderRightColor: 'white', borderWidth: '2px'}}></div>
-                          <span>Translating...</span>
+                          <span>{simplifyText ? 'Simplifying...' : 'Translating...'}</span>
                         </>
                       ) : (
                         <>
@@ -302,7 +363,7 @@ function App() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                           </div>
-                          <span>Translate</span>
+                          <span>{simplifyText ? 'Simplify & Translate' : 'Translate'}</span>
                         </>
                       )}
                     </div>
@@ -357,7 +418,7 @@ function App() {
                 ) : (
                   <div className="h-full flex flex-col">
                     <div className="flex-1 scrollable-container">
-                      <SignWritingDisplay fswTokens={signWriting} style={{ background: 'var(--bg-secondary)' }} />
+                      <SignWritingDisplay fswTokens={signWriting} />
                     </div>
                     {/* Footer with instructions - only show when there are signs */}
                     {signWriting.length > 0 && (
@@ -420,7 +481,7 @@ function App() {
                     </div>
                   ) : poseFile ? (
                     <div className="w-full h-full flex items-center justify-center">
-                      <PoseViewer poseFile={poseFile} onAnimationComplete={() => {}} isTranslating={isGeneratingAnimation} style={{ background: 'var(--bg-secondary)' }} />
+                      <PoseViewer poseFile={poseFile} onAnimationComplete={() => {}} isTranslating={isGeneratingAnimation} />
                     </div>
                   ) : (
                     <div className="text-center text-theme-muted">
@@ -478,6 +539,15 @@ function App() {
           recordingSource={recordingSource}
           setRecordingSource={setRecordingSource}
           onClose={() => setIsRecording(false)}
+        />
+      )}
+      {/* Simplify Choice Modal */}
+      {showSimplifyModal && (
+        <SimplifyChoiceModal
+          original={pendingOriginalText}
+          simplified={simplifiedText}
+          onSelect={handleSimplifyModalSelect}
+          onClose={() => setShowSimplifyModal(false)}
         />
       )}
     </div>
